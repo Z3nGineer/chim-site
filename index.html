@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHIM — Oblivion Remastered Modpack</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060605;--surface:#0e0e0d;--surface-2:#161615;--surface-3:#1e1e1d;
+  --border:#252523;--border-light:#333;
+  --text:#efe8da;--text-dim:#cdc0ae;--text-muted:#9a8e80;
+  --gold:#c9a84c;--gold-bright:#e4c565;--gold-dim:#8a7234;--gold-glow:rgba(201,168,76,0.07);
+  --esp:#5a8ec5;--esp-glow:rgba(90,142,197,0.1);
+  --pak:#5a9a5a;--pak-glow:rgba(90,154,90,0.1);
+  --ue4ss:#9a6ac5;--ue4ss-glow:rgba(154,106,197,0.1);
+  --obse:#c5a05a;--obse-glow:rgba(197,160,90,0.1);
+  --json:#5ac5a0;--json-glow:rgba(90,197,160,0.1);
+  --warn:#c55a5a;
+}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--gold-dim) var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:20px;line-height:1.8;overflow-x:hidden}
+::selection{background:var(--gold);color:var(--bg)}
+a{color:var(--gold);text-decoration:none}a:hover{color:var(--gold-bright)}
+
+/* Cursor */
+.glow{position:fixed;width:500px;height:500px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(201,168,76,0.03) 0%,transparent 70%);transform:translate(-50%,-50%);transition:left 0.3s,top 0.3s}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(6,6,5,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px}
+.nav-brand{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;letter-spacing:0.15em;color:var(--text);text-decoration:none;transition:color 0.3s}
+.nav-brand:hover{color:var(--gold)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);text-decoration:none;transition:color 0.3s;position:relative}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transition:transform 0.3s;transform-origin:right}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+
+/* Hero */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:6rem 2rem 5rem;position:relative;z-index:2;
+  background:#060605;
+  overflow:hidden;
+}
+.hero-bg-img{
+  position:absolute;inset:0;z-index:0;
+  background:url('hero-bg.jpg') center center / cover no-repeat;
+  opacity:0.65;
+  animation:heroZoom 25s ease-in-out infinite alternate;
+}
+@keyframes heroZoom{
+  0%{transform:scale(1) translateY(0)}
+  100%{transform:scale(1.08) translateY(-1%)}
+}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:350px;background:linear-gradient(0deg,var(--bg) 5%,transparent);pointer-events:none;z-index:3}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 40%,rgba(201,168,76,.08) 0%,transparent 70%),
+    linear-gradient(180deg,rgba(6,6,5,0.3) 0%,rgba(6,6,5,0.1) 40%,rgba(6,6,5,0.5) 80%,var(--bg) 100%);
+  pointer-events:none;z-index:1;
+}
+/* Floating particles */
+.particles{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,.9),rgba(201,168,76,.2),transparent);
+  box-shadow:0 0 6px rgba(201,168,76,.4),0 0 15px rgba(201,168,76,.15);
+  animation:particleFloat linear infinite;
+  opacity:0;
+}
+@keyframes particleFloat{
+  0%{opacity:0;transform:translateY(90vh) scale(0.3)}
+  15%{opacity:0.8}
+  50%{opacity:1}
+  85%{opacity:0.6}
+  100%{opacity:0;transform:translateY(-15vh) scale(0.5)}
+}
+
+.hero h1{
+  font-family:'Cinzel',serif;font-size:clamp(3.5rem,10vw,7rem);font-weight:400;
+  letter-spacing:0.4em;color:var(--gold);position:relative;z-index:2;
+  text-shadow:0 0 60px rgba(201,168,76,0.3),0 0 120px rgba(201,168,76,0.1);
+  animation:fadeUp 1s ease both,shimmer 5s ease-in-out infinite 1.5s;
+  background:linear-gradient(120deg,var(--gold) 0%,#fff5d4 20%,var(--gold) 40%,#b8872e 60%,var(--gold) 80%,#fff5d4 100%);
+  background-size:400% 100%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-family:'Cinzel',serif;font-size:clamp(1rem,1.8vw,1.2rem);
+  letter-spacing:0.5em;text-transform:uppercase;color:var(--text-dim);text-shadow:0 2px 8px rgba(0,0,0,.6);
+  margin:0.8rem 0 2rem;position:relative;z-index:1;
+  animation:fadeUp 1s ease 0.2s both;
+}
+.hero-desc{
+  font-size:1.5rem;font-weight:400;color:var(--text);
+  max-width:650px;position:relative;z-index:2;text-shadow:0 2px 12px rgba(0,0,0,.7);
+  animation:fadeUp 1s ease 0.4s both;
+}
+.hero-desc strong{color:#fff;font-weight:700;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.hero-lore{
+  font-size:1.2rem;font-weight:400;color:var(--text-dim);
+  max-width:750px;position:relative;z-index:2;text-shadow:0 2px 10px rgba(0,0,0,.7);
+  line-height:1.9;margin:1.8rem auto 0;
+  animation:fadeUp 1.2s ease 0.6s both;
+}
+.hero-lore strong{color:var(--gold);font-weight:700}
+.hero-lore em{color:var(--text);font-style:italic}
+
+/* Sections */
+section{padding:5rem 2rem;position:relative;z-index:2}
+.container{max-width:1000px;margin:0 auto}
+.section-label{font-size:0.65rem;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:0.6rem}
+.section-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:700;color:var(--text);text-align:center;letter-spacing:0.1em;margin-bottom:0.8rem}
+.section-desc{text-align:center;color:var(--text-dim);font-size:1.15rem;font-weight:400;max-width:650px;margin:0 auto 3rem;line-height:1.8}
+.divider{width:50px;height:2px;margin:0 auto 3rem;background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-dim));border-radius:2px}
+
+/* Philosophy */
+.phil-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+.phil{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:2rem 1.5rem;text-align:center;
+  transition:all 0.4s cubic-bezier(.22,1,.36,1);
+  position:relative;overflow:hidden;
+}
+.phil::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity 0.4s;
+}
+.phil:hover{border-color:rgba(201,168,76,0.25);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.4),0 0 30px rgba(201,168,76,0.05)}
+.phil:hover::before{opacity:1}
+.phil h3{font-family:'Cinzel',serif;font-size:0.85rem;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:0.6rem}
+.phil p{font-size:1rem;color:var(--text-dim);font-weight:400;line-height:1.7}
+.phil-icon{font-size:1.8rem;margin-bottom:0.8rem;display:block}
+
+/* Mod list */
+.cat{margin-bottom:0.5rem}
+.cat-header{display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:color 0.2s}
+.cat-header:hover h3{color:var(--gold-bright)}
+.cat-header h3{font-family:'Cinzel',serif;font-size:1rem;font-weight:700;color:var(--gold);letter-spacing:0.08em;white-space:nowrap;transition:color 0.2s}
+.cat-line{flex:1;height:1px;background:var(--border)}
+.cat-count{font-size:0.7rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);white-space:nowrap}
+.cat-toggle{color:var(--text-muted);font-size:0.7rem;transition:transform 0.3s}
+.cat-toggle.open{transform:rotate(180deg)}
+
+.mods{display:flex;flex-direction:column;gap:0;max-width:100%;max-height:0;overflow:hidden;transition:max-height 0.4s ease}
+.mods.open{max-height:3000px}
+.mod{display:flex;align-items:flex-start;gap:1rem;padding:0.9rem 0;border-bottom:1px solid rgba(37,37,35,0.5)}
+.mod:last-child{border-bottom:none}
+.mod:hover{background:rgba(201,168,76,0.02);margin:0 -0.5rem;padding-left:0.5rem;padding-right:0.5rem;border-radius:6px}
+
+.badge{font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:4px;flex-shrink:0;margin-top:0.15rem;text-align:center;min-width:48px}
+.b-esp{background:var(--esp-glow);color:var(--esp);border:1px solid rgba(90,142,197,0.2)}
+.b-pak{background:var(--pak-glow);color:var(--pak);border:1px solid rgba(90,154,90,0.2)}
+.b-ue4ss{background:var(--ue4ss-glow);color:var(--ue4ss);border:1px solid rgba(154,106,197,0.2)}
+.b-obse{background:var(--obse-glow);color:var(--obse);border:1px solid rgba(197,160,90,0.2)}
+.b-json{background:var(--json-glow);color:var(--json);border:1px solid rgba(90,197,160,0.2)}
+
+.mod-info{flex:1}
+.mod-name{font-size:1rem;font-weight:600;color:var(--text)}
+.mod-name a{color:var(--text);text-decoration:none;transition:color .2s}
+.mod-name a:hover{color:var(--gold)}
+.mod-desc{font-size:0.95rem;color:var(--text-dim);font-weight:400;margin-top:0.15rem}
+.mod-tags{display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap}
+.tag-patch{font-family:'JetBrains Mono',monospace;font-size:0.55rem;font-weight:600;letter-spacing:0.08em;color:var(--gold);background:var(--gold-glow);padding:0.15rem 0.5rem;border-radius:3px;border:1px solid rgba(201,168,76,0.15)}
+.tag-warn{font-family:'JetBrains Mono',monospace;font-size:0.55rem;font-weight:600;letter-spacing:0.08em;color:var(--warn);background:rgba(197,90,90,0.08);padding:0.15rem 0.5rem;border-radius:3px;border:1px solid rgba(197,90,90,0.15)}
+
+/* Patches */
+.patches{display:flex;flex-direction:column;gap:1rem}
+.patch{
+  background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold-dim);
+  border-radius:0 10px 10px 0;padding:1.5rem 2rem;
+  transition:all 0.4s cubic-bezier(.22,1,.36,1);
+  position:relative;overflow:hidden;
+}
+.patch::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(201,168,76,0.03),transparent 50%);
+  opacity:0;transition:opacity 0.4s;pointer-events:none;
+}
+.patch:hover{border-left-color:var(--gold);transform:translateX(4px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.patch:hover::after{opacity:1}
+.patch h4{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:0.5rem;position:relative}
+.patch p{font-size:1rem;color:var(--text-dim);line-height:1.7;font-weight:400;position:relative}
+.patch code{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--gold-bright);background:rgba(201,168,76,0.08);padding:0.15rem 0.5rem;border-radius:3px;border:1px solid rgba(201,168,76,0.12)}
+
+/* Install */
+.install{text-align:center;padding:3.5rem 2rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;position:relative;overflow:hidden}
+.install::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,var(--gold-glow),transparent 60%);pointer-events:none}
+.install h3{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:0.15em;margin-bottom:0.8rem;position:relative}
+.install p{color:var(--text-muted);font-weight:300;position:relative}
+
+/* Install step cards */
+.step-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;
+  transition:all 0.4s cubic-bezier(.22,1,.36,1);position:relative;overflow:hidden;
+}
+.step-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  opacity:0;transition:opacity 0.4s;
+}
+.step-card:hover{border-color:rgba(201,168,76,0.2);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.step-card:hover::before{opacity:1}
+.step-card .step-num{font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:1.2rem;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.5rem}
+.step-card .step-num span{width:28px;height:28px;border:1px solid var(--gold-dim);display:inline-flex;align-items:center;justify-content:center;font-size:0.85rem}
+.install-platforms{display:flex;justify-content:center;gap:1.5rem;margin-top:1.2rem;position:relative}
+.install-platforms span{font-size:0.75rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);padding:0.5rem 1.5rem;border:1px solid var(--border);border-radius:20px}
+
+/* Footer */
+footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);position:relative;z-index:2}
+.footer-chim{font-family:'Cinzel',serif;font-size:1.5rem;color:var(--gold);letter-spacing:0.4em;margin-bottom:0.2rem}
+.footer-iam{font-family:'Cinzel',serif;font-size:0.75rem;color:var(--gold-dim);letter-spacing:0.5em;margin-bottom:1.5rem}
+.footer-credit{font-size:0.7rem;color:var(--text-muted);font-weight:300}
+
+.reveal{opacity:0;transform:translateY(30px) scale(0.98);transition:opacity 0.9s cubic-bezier(.22,1,.36,1),transform 0.9s cubic-bezier(.22,1,.36,1)}
+.reveal.visible{opacity:1;transform:translateY(0) scale(1)}
+.r1{transition-delay:0.12s}.r2{transition-delay:0.24s}.r3{transition-delay:0.36s}.r4{transition-delay:0.48s}
+
+@keyframes fadeUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* Premium glow dividers between sections */
+.glow-divider{height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold-dim) 30%,var(--gold) 50%,var(--gold-dim) 70%,transparent 95%);opacity:0.4;margin:0}
+
+/* Stat counters */
+.stats-row{display:flex;justify-content:center;gap:3rem;margin:2rem 0;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Cinzel',serif;font-size:2.5rem;font-weight:700;color:var(--gold);line-height:1}
+.stat-label{font-size:0.75rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-top:0.3rem}
+
+/* Download CTA button glow */
+.cta-glow{
+  position:relative;display:inline-block;
+  font-family:'Cinzel',serif;font-size:0.95rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--bg);background:linear-gradient(135deg,var(--gold-dim),var(--gold),var(--gold-bright));
+  padding:1rem 2.5rem;border:none;border-radius:3px;text-decoration:none;
+  transition:all 0.3s;cursor:pointer;
+}
+.cta-glow:hover{
+  color:var(--bg);
+  box-shadow:0 0 30px rgba(201,168,76,0.35),0 0 60px rgba(201,168,76,0.15);
+  transform:translateY(-2px);
+}
+.cta-glow::before{
+  content:'';position:absolute;inset:-2px;border-radius:5px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-bright),var(--gold));
+  z-index:-1;opacity:0;transition:opacity 0.3s;filter:blur(8px);
+}
+.cta-glow:hover::before{opacity:0.5}
+
+/* Hero scroll indicator */
+.scroll-hint{
+  position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:4;
+  opacity:0.4;animation:scrollBob 2.5s ease-in-out infinite;
+}
+.scroll-hint span{
+  display:block;width:20px;height:32px;border:2px solid var(--gold-dim);border-radius:10px;position:relative;
+}
+.scroll-hint span::after{
+  content:'';width:3px;height:6px;background:var(--gold);border-radius:2px;
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  animation:scrollDot 2.5s ease-in-out infinite;
+}
+@keyframes scrollBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+@keyframes scrollDot{0%{opacity:1;top:6px}100%{opacity:0;top:18px}}
+
+/* Mobile hero fixes */
+@media(max-width:700px){
+  .hero{min-height:100svh;padding:8rem 1.5rem 4rem}
+  .hero-bg-img{background-position:center center;animation:none}
+  .hero h1{font-size:clamp(3rem,14vw,5rem)}
+  .hero-desc{font-size:1.1rem}
+  .hero-lore{font-size:1rem;line-height:1.7}
+  .stats-row{gap:1.5rem}
+  .stat-num{font-size:1.8rem}
+  .cta-glow{padding:0.9rem 2rem;font-size:0.85rem}
+}
+/* Smooth scroll */
+html{scroll-behavior:smooth}
+
+@media(max-width:900px){.phil-grid{grid-template-columns:1fr 1fr}}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:0.5rem}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--text);transition:all 0.3s}
+@media(max-width:700px){
+  .nav-toggle{display:flex}
+  .nav-links{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:rgba(6,6,5,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:1rem 2rem;gap:0}
+  .nav-links.open{display:flex}
+  .nav-links a{height:44px;display:flex;align-items:center}
+  .phil-grid{grid-template-columns:1fr}
+  .mod{flex-direction:column;gap:0.3rem}
+  .badge{align-self:flex-start}
+  section{padding:3.5rem 1.5rem}
+}
+
+/* Global Nav */
+.global-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(8,8,8,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.global-nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px}
+.global-nav-brand{font-family:'Cinzel',serif;font-size:0.9rem;font-weight:700;letter-spacing:0.15em;color:#e0e0e0;text-decoration:none;transition:color 0.3s}
+.global-nav-brand:hover{color:#c8a050}
+.global-nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+.global-nav-links a{font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#6a6a6a;text-decoration:none;transition:color 0.3s}
+.global-nav-links a:hover{color:#c8a050;text-decoration:none}
+.global-nav-dropdown{position:relative}
+.global-nav-dropdown>a{display:flex;align-items:center;gap:0.3rem}
+.global-dd-arrow{font-size:0.5rem;transition:transform 0.2s;margin-top:1px}
+.global-nav-dropdown:hover .global-dd-arrow{transform:rotate(180deg)}
+.global-dd-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(8px);min-width:180px;background:rgba(15,15,15,0.97);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.5rem 0;opacity:0;visibility:hidden;transition:opacity 0.2s,transform 0.2s,visibility 0.2s}
+.global-nav-dropdown:hover .global-dd-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.global-dd-menu a{display:block;padding:0.55rem 1.25rem;font-size:0.78rem;font-weight:500;letter-spacing:0.06em;color:#999;transition:color 0.15s,background 0.15s}
+.global-dd-menu a:hover{color:#fff;background:rgba(255,255,255,0.04)}
+.global-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:0.5rem}
+.global-hamburger span{display:block;width:22px;height:2px;background:#e0e0e0;transition:all 0.3s}
+@media(max-width:700px){
+  .global-hamburger{display:flex}
+  .global-nav-links{display:flex;flex-direction:column;gap:0;position:absolute;top:60px;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease;padding:0}
+  .global-nav-links.open{max-height:600px;padding:0.5rem 0}
+  .global-nav-links>li{list-style:none}
+  .global-nav-links>li>a{display:block;padding:0.8rem 2rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .global-dd-menu{position:static;opacity:1;visibility:visible;transform:none;border:none;border-radius:0;min-width:auto;padding:0;background:none;backdrop-filter:none;box-shadow:none}
+  .global-dd-menu a{padding:0.7rem 2rem 0.7rem 3rem;font-size:0.8rem;border-bottom:1px solid rgba(255,255,255,0.04)}
+  .global-nav-dropdown>a{display:none}
+}
+/* Page Sub-Nav */
+.page-subnav{position:sticky;top:60px;z-index:999;background:rgba(12,12,12,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.04);height:40px;display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.page-subnav::-webkit-scrollbar{display:none}
+.page-subnav-inner{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;gap:1.5rem;white-space:nowrap}
+.page-subnav a{font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#5a5a5a;text-decoration:none;transition:color 0.2s}
+.page-subnav a:hover,.page-subnav a.active{color:#ccc}
+
+</style>
+</head>
+<body>
+
+<div class="glow" id="glow"></div>
+
+<nav class="global-nav">
+  <div class="global-nav-inner">
+    <a href="#" class="global-nav-brand">CHIM</a>
+    <button class="global-hamburger" id="globalHamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="global-nav-links" id="globalNavLinks">
+      <li><a href="#philosophy">Philosophy</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#modlist">Mod List</a></li>
+      <li><a href="#support">Support</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg-img"></div>
+  <div class="particles" id="particles"></div>
+  <h1>CHIM</h1>
+  <p class="hero-sub">See the dream. Reshape it.</p>
+  <p class="hero-desc">A <strong>hand-curated overhaul</strong> for Oblivion Remastered. 79 mods, tested load order, one-click installer. Linux &amp; Steam Deck.</p>
+
+  <div class="stats-row" style="position:relative;z-index:2;animation:fadeUp 1s ease 0.5s both">
+    <div class="stat"><div class="stat-num" data-count="79">0</div><div class="stat-label">Curated Mods</div></div>
+    <div class="stat"><div class="stat-num" data-count="77">0</div><div class="stat-label">Ordered ESPs</div></div>
+    <div class="stat"><div class="stat-num" data-count="14">0</div><div class="stat-label">Categories</div></div>
+    <div class="stat"><div class="stat-num" data-count="60">0</div><div class="stat-label">Custom Tweaks</div></div>
+  </div>
+
+  <div style="position:relative;z-index:2;margin-top:2rem;animation:fadeUp 1s ease 0.7s both">
+    <a href="#install" class="cta-glow">Download Installer</a>
+  </div>
+
+  <p class="hero-lore">In Elder Scrolls lore, <strong style="color:var(--gold)">CHIM</strong> is the secret syllable of royalty &mdash; the state of achieving divine awareness within the Godhead's dream while maintaining your own identity. Where others who glimpse the truth zero-sum and cease to exist, those who achieve <strong style="color:var(--gold)">CHIM</strong> see the dream for what it is and <em>reshape it</em>. Tiber Septim used it to change the jungle of Cyrodiil into the grasslands you walk today. This modpack carries that name because it does the same thing &mdash; it sees Oblivion for what it was always meant to be and reshapes it, without breaking the dream.</p>
+
+  <div class="scroll-hint"><span></span></div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="philosophy">
+  <div class="container">
+    <p class="section-label reveal">Philosophy</p>
+    <h2 class="section-title reveal r1">The Old Ways</h2>
+    <p class="section-desc reveal r2"><strong style="color:var(--gold)">CHIM</strong> doesn't change Oblivion. It reveals what Oblivion was always meant to be.</p>
+
+    <div class="phil-grid">
+      <div class="phil reveal"><span class="phil-icon">&#x2726;</span><h3>Enhanced, Not Replaced</h3><p>Better, not different. Every mod enhances the original. No total conversions, no difficulty spikes.</p></div>
+      <div class="phil reveal r1"><span class="phil-icon">&#x2694;</span><h3>Fun From Level 1</h3><p>Combat feels good, magic works, progression rewards you from the first hour.</p></div>
+      <div class="phil reveal r2"><span class="phil-icon">&#x2699;</span><h3>Tested &amp; Tuned</h3><p>Every mod checked for conflicts. Custom patches where needed. Hand-curated load order.</p></div>
+      <div class="phil reveal r3"><span class="phil-icon">&#x2605;</span><h3>Cross-Platform</h3><p>Works on Linux and Windows. Proton tested. Platform-specific install guides included.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="patches">
+  <div class="container">
+    <p class="section-label reveal">Original Work</p>
+    <h2 class="section-title reveal r1"><span style="color:var(--gold)">CHIM</span> Patches</h2>
+    <p class="section-desc reveal r2">Where I had to write custom code to make things work together. These are the patches that come with the modpack.</p>
+
+    <div class="patches">
+      <div class="patch reveal">
+        <h4>Darkness & Lighting Tuning</h4>
+        <p>Nights are actually dark now but you can still see where you're going. Interiors are tuned per location &mdash; caves are dim, houses are warm, dungeons are atmospheric without being unplayable. All done through custom configs for Eternal Darkness and UltraPlus.</p>
+      </div>
+      <div class="patch reveal r1">
+        <h4>Crash Fixes for Lighting Mods</h4>
+        <p>LumenRemastered and ShadersRevised both crash on fast travel because of an API change in UE4SS. Patched both so they work without issues.</p>
+      </div>
+      <div class="patch reveal r2">
+        <h4>Controller Vibration Fix</h4>
+        <p>Sustained spell effects cause permanent controller vibration that never stops. Fixed in <code>Engine.ini</code> &mdash; only affects Oblivion, other games keep rumble.</p>
+      </div>
+      <div class="patch reveal r3">
+        <h4>Hand-Tuned Load Order</h4>
+        <p>Every plugin ordered and tested for conflicts. The game is picky about how <code>Plugins.txt</code> is formatted &mdash; get it wrong and you freeze on a black screen. CHIM ships a pre-built load order that just works.</p>
+      </div>
+      <div class="patch reveal r4">
+        <h4>Pinned Framework Versions</h4>
+        <p>OBSE and UE4SS are bundled at specific tested versions. Nexus updates can break compatibility between mods, so the installer uses the exact builds I verified against every mod in the pack.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="install" style="background:linear-gradient(180deg,var(--bg),var(--surface),var(--bg))">
+  <div class="container">
+    <p class="section-label reveal">Installation</p>
+    <h2 class="section-title reveal r1">Get Started</h2>
+    <div class="divider reveal r2"></div>
+
+    <!-- Download Buttons -->
+    <div class="install reveal r3">
+      <h3>Download the Installer</h3>
+      <p>One file. No dependencies. Works on Windows, Linux, and Steam Deck.</p>
+      <div class="install-platforms" style="margin-top:1.5rem">
+        <a href="https://github.com/Z3nGineer/chim-installer/releases/latest/download/CHIM_Installer.exe" style="font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);padding:0.7rem 2rem;border:1px solid var(--gold-dim);border-radius:20px;text-decoration:none;transition:all 0.2s;position:relative">&#11015; Windows</a>
+        <a href="https://github.com/Z3nGineer/chim-installer/releases/latest/download/CHIM_Installer_Linux.tar.gz" style="font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);padding:0.7rem 2rem;border:1px solid var(--gold-dim);border-radius:20px;text-decoration:none;transition:all 0.2s;position:relative">&#11015; Linux / Steam Deck</a>
+      </div>
+      <p style="color:var(--text-muted);font-size:0.7rem;margin-top:1rem;position:relative">Windows: double-click the .exe &nbsp;|&nbsp; Linux/Deck: extract the .tar.gz, double-click CHIM_Installer</p>
+    </div>
+
+    <!-- What the Installer Does -->
+    <div style="margin-top:3rem">
+      <p class="section-label reveal">How It Works</p>
+      <h2 class="section-title reveal r1">The <span style="color:var(--gold)">CHIM</span> Installer</h2>
+      <p class="section-desc reveal r2">I built a custom installer so you don't have to figure out where 79 mods go. You grab the files, it handles the rest.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem" class="reveal r3">
+      <div class="step-card">
+        <div class="step-num"><span>1</span> Pick Your Profile</div>
+        <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7">It figures out what you're running on and gives you two options. <strong style="color:var(--gold)">CHIM</strong> if you're on a PC with a real GPU — all 79 mods, everything maxed out. <strong><span style="color:var(--gold)">CHIM</span> <span style="color:#5c9fd6">Deck</span></strong> if you're on Steam Deck — swaps the heavy visual stuff for optimization mods that actually make the game run.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num"><span>2</span> Download the Mods</div>
+        <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7">It goes through each mod one at a time — opens the Nexus page for you, you click "Slow Download" (free, no premium needed), and it watches your Downloads folder. When the file shows up, it checks it off and moves to the next one. Or paste your Nexus API key and it downloads everything automatically.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num"><span>3</span> It Verifies Everything</div>
+        <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7">Once everything's downloaded, it checks every single archive before touching your game. Looks for corrupt files, wrong file types, mod conflicts, disk space — the whole thing. If something's wrong, it tells you exactly what. Nothing gets installed until it all checks out.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num"><span>4</span> Install</div>
+        <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7">It extracts everything and puts each file exactly where it needs to go. ESPs to Data, PAKs to the mods folder, OBSE plugins to their folder, UE4SS mods get set up and enabled. If you're on Steam Deck, it also drops in a custom Engine.ini I tuned with 50+ settings specifically for that hardware.</p>
+      </div>
+    </div>
+
+    <div class="step-card reveal r4" style="margin-bottom:2rem;border-color:var(--gold-dim)">
+      <div class="step-num"><span>5</span> Set Steam Launch Options</div>
+      <p style="color:var(--text);font-size:0.9rem;line-height:1.7;margin-bottom:0.8rem">Right-click the game in Steam &rarr; Properties &rarr; Launch Options. Paste the one for your platform:</p>
+      <p style="color:var(--text-muted);font-size:0.75rem;font-weight:600;letter-spacing:0.08em;margin-bottom:0.3rem">LINUX / STEAM DECK</p>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--gold-bright);line-height:1.6;word-break:break-all;user-select:all;margin-bottom:0.8rem">WINEDLLOVERRIDES="winmm=n,b" DXVK_ASYNC=1 SDL_HAPTIC_DISABLED=1 bash -c 'exec "${@/OblivionRemastered.exe/OblivionRemastered/Binaries/Win64/obse64_loader.exe}"' -- %command%</div>
+      <p style="color:var(--text-muted);font-size:0.75rem;font-weight:600;letter-spacing:0.08em;margin-bottom:0.3rem">WINDOWS</p>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:0.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--gold-bright);line-height:1.6;word-break:break-all;user-select:all">"%command%/../obse64_loader.exe"</div>
+      <p style="color:var(--text-dim);font-size:0.8rem;line-height:1.6;margin-top:0.6rem">This tells Steam to launch through OBSE instead of the default exe. Without it, half the mods won't load. The installer copies this to your clipboard automatically.</p>
+    </div>
+
+    <!-- Two Profiles Explained -->
+    <div style="margin-top:3rem">
+      <p class="section-label reveal">Two Profiles</p>
+      <h2 class="section-title reveal r1">Same Gameplay, Different Hardware</h2>
+      <p class="section-desc reveal r2">Both versions get the full combat overhaul, magic rework, AI improvements, QoL fixes, and new content. The difference is how we handle visuals.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem" class="reveal r3">
+      <div class="step-card" style="border-color:var(--gold-dim)">
+        <div style="font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:1.3rem;letter-spacing:0.1em;margin-bottom:0.3rem"><span style="color:var(--gold)">CHIM</span></div>
+        <div style="color:var(--text-dim);font-size:0.8rem;margin-bottom:1rem">PC — Max Quality</div>
+        <div style="color:var(--text-dim);font-size:0.9rem;line-height:1.8">
+          <strong style="color:var(--text)">79 mods.</strong> Combat that actually feels good, enemies that fight smart, magic that's worth using, animations that don't look like 2006. On top of that — darker nights, better lighting, hi-res textures, real foliage, NPC overhaul, 8K world map. Every QoL fix I could find and a bunch of new quest content. If you've got a decent GPU, this is how the game should've shipped.
+        </div>
+      </div>
+      <div class="step-card" style="border-color:#3a6a9a">
+        <div style="font-family:'Cinzel',serif;font-weight:700;font-size:1.3rem;letter-spacing:0.1em;margin-bottom:0.3rem"><span style="color:var(--gold)">CHIM</span> <span style="color:#5c9fd6">Deck</span></div>
+        <div style="color:var(--text-dim);font-size:0.8rem;margin-bottom:1rem">Steam Deck — Max Optimization</div>
+        <div style="color:var(--text-dim);font-size:0.9rem;line-height:1.8">
+          <strong style="color:var(--text)">72 mods.</strong> Out of the box this game gets like 20 FPS on Steam Deck with constant crashes. Valve slapped "Verified" on it anyway. I pulled out the 11 visual mods that are pointless at 800p, added 7 optimization mods that actually fix the VRAM crashes and kill the forced ray tracing, and wrote a custom Engine.ini with 50+ tweaked settings. Shadows, fog, grass, shaders, the loading screen crash that freezes your Deck — all of it handled. You still get every gameplay mod. Combat, magic, AI, animations, QoL, new content — all there. You just don't get the eye candy your hardware can't render anyway.
+        </div>
+      </div>
+    </div>
+
+    <!-- Steam Deck Details -->
+    <div style="margin-top:3rem">
+      <p class="section-label reveal">Steam Deck</p>
+      <h2 class="section-title reveal r1">What <span style="color:var(--gold)">CHIM</span> <span style="color:#5c9fd6">Deck</span> Actually Does</h2>
+      <p class="section-desc reveal r2">This game is borderline broken on Deck out of the box. Here's what's wrong and how CHIM fixes it.</p>
+    </div>
+
+    <div class="reveal r3" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:2rem">
+      <div style="font-family:'Cinzel',serif;font-weight:700;color:#5c9fd6;font-size:1rem;margin-bottom:1rem">The Problem</div>
+      <p style="color:var(--text-dim);font-size:0.95rem;line-height:1.7;margin-bottom:1rem">Oblivion Remastered on Steam Deck is rough. 20-25 FPS on Low with stuttering everywhere, VRAM overflow crashes because the game tries to load more textures than the Deck's 4GB GPU memory can hold, and a loading screen bug that freezes your Deck about 90% of the time when you walk outside. Valve said "Verified." I disagree.</p>
+
+      <div style="font-family:'Cinzel',serif;font-weight:700;color:#5c9fd6;font-size:1rem;margin-bottom:1rem;margin-top:1.5rem">What I Did About It</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Killed the forced ray tracing</strong> — Lumen RT is the biggest FPS killer and the Deck can't even do hardware RT. Ripping it out gives you back 15-20 frames instantly.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Fixed the VRAM crashes</strong> — The game just keeps loading textures until the GPU runs out of memory and dies. I capped the texture streaming pool at 3GB and plugged the memory leak.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Fixed the loading screen freeze</strong> — FPS spikes to like 250 during loading screens, then the GPU chokes when it suddenly has to render the open world. I cap it at 30 even during loads so the transition doesn't brick your Deck.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Cut shadow cost by 80%</strong> — Dropped shadow cascades from 10 to 2, resolution from 8192 to 1024. At 800p you literally cannot tell the difference. Your framerate can.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Thinned out the grass</strong> — Brought density down to 40%. Still looks fine at 800p but the GPU renders 60% less geometry. The open world is where the Deck dies hardest so this matters a lot.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Got rid of the stutter</strong> — Enabled shader pre-compilation and disk caching so the game isn't compiling shaders on the fly every time you look at something new. That's what causes the hitching when you walk around.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Turned off fog and cloth physics</strong> — Volumetric fog and cloak physics look cool but at 800p they're eating GPU time you don't have. Gone.
+        </div>
+        <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
+          <strong style="color:var(--text)">Dialed in every setting</strong> — Wrote a GameUserSettings.ini with everything set exactly where it needs to be for 1280x800 with XeSS doing the heavy lifting. You don't have to touch the settings menu.
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;padding:1.5rem 2rem;background:rgba(201,168,76,0.04);border:2px solid var(--gold-dim);border-radius:10px">
+        <div style="font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:1.2rem;margin-bottom:0.8rem;letter-spacing:0.08em">&#x26a0; Required After Install</div>
+        <p style="color:var(--text);font-size:0.95rem;line-height:1.7;margin-bottom:0.8rem">Hit the <strong>... button</strong> on your Deck and set these <strong>for this game</strong>. CHIM won't hit 30 FPS without them.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 2rem;color:var(--text);font-size:0.95rem;line-height:2;margin-bottom:1rem">
+          <div>Framerate Limit: <strong style="color:var(--gold)">30 FPS</strong></div>
+          <div>Refresh Rate: <strong style="color:var(--gold)">40 Hz</strong></div>
+          <div>Allow Tearing: <strong style="color:var(--gold)">Off</strong></div>
+          <div>TDP Limit: <strong style="color:var(--gold)">12-15W</strong></div>
+          <div>GPU Clock: <strong style="color:var(--gold)">1200 MHz</strong></div>
+        </div>
+        <p style="color:var(--text);font-size:0.95rem;line-height:1.7">
+          Use <strong style="color:var(--gold)">Proton Experimental</strong> or <strong style="color:var(--gold)">GE-Proton 10-1+</strong>. Game <strong>must</strong> be on your <strong style="color:var(--gold)">internal SSD</strong> — SD card is too slow.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="glow-divider"></div>
+
+<section id="modlist" style="background:linear-gradient(180deg,var(--bg),var(--surface),var(--bg))">
+  <div class="container">
+    <p class="section-label reveal">The Compendium</p>
+    <h2 class="section-title reveal r1">Mod List</h2>
+    <p class="section-desc reveal r2">Every mod, catalogued. I tested all of these together so you don't have to.</p>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Bug Fixes & Framework</h3><div class="cat-line"></div><span class="cat-count">9 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-obse">OBSE</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/282" target="_blank">OBSE64</a></div><div class="mod-desc">Script extender framework</div></div></div>
+        <div class="mod"><span class="badge b-obse">OBSE</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4475" target="_blank">Address Library</a></div><div class="mod-desc">Memory address database for OBSE plugins</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/32" target="_blank">UE4SS</a></div><div class="mod-desc">Unreal Engine scripting system</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/477" target="_blank">Unofficial Oblivion Remastered Patch</a></div><div class="mod-desc">Community bug fixes</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4676" target="_blank">Oblivion Unreal Fixes</a></div><div class="mod-desc">Cloth physics and clipping fixes</div></div></div>
+        <div class="mod"><span class="badge b-obse">OBSE</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4994" target="_blank">ActiveEffectsFix</a></div><div class="mod-desc">Fixes stacking active effects</div></div></div>
+        <div class="mod"><span class="badge b-obse">OBSE</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/145" target="_blank">Baka Achievement Enabler</a></div><div class="mod-desc">Achievements with mods enabled</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/58" target="_blank">Difficulty Slider Fixed</a></div><div class="mod-desc">Makes the difficulty slider actually work</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/566" target="_blank">RainFPSFix</a></div><div class="mod-desc">Fixes the FPS drop when it rains</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Visuals & Lighting</h3><div class="cat-line"></div><span class="cat-count">13 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1528" target="_blank">Shaders Revised</a></div><div class="mod-desc">Fixes the orange tint, restores natural colors</div><div class="mod-tags"><span class="tag-patch">CHIM PATCHED</span></div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1129" target="_blank">Lumen Remastered</a></div><div class="mod-desc">Better Lumen GI shadows</div><div class="mod-tags"><span class="tag-patch">CHIM PATCHED</span></div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3100" target="_blank">Lumiere</a></div><div class="mod-desc">Road lamps, inn lanterns, immersive light placement</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/5136" target="_blank">Eternal Darkness</a></div><div class="mod-desc">Actually dark nights and dungeons</div><div class="mod-tags"><span class="tag-patch">CHIM PATCHED</span></div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/27" target="_blank">UltraPlusExtensions</a></div><div class="mod-desc">Graphics quality framework</div><div class="mod-tags"><span class="tag-patch">CHIM PATCHED</span></div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/445" target="_blank">Young Textures Revamped</a></div><div class="mod-desc">Better character skin textures</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2279" target="_blank">Greener Grass</a></div><div class="mod-desc">Lush grass that actually looks alive</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4740" target="_blank">Connor's Flora</a></div><div class="mod-desc">Better trees and shrubs</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3096" target="_blank">NPC Overhaul AIO</a></div><div class="mod-desc">NPCs that don't all look the same</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/944" target="_blank">8K Color World Map</a></div><div class="mod-desc">High-res world map</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2821" target="_blank">Brighter Torches 1.5x</a></div><div class="mod-desc">Torches that actually light your way</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1284" target="_blank">Realistic HQ Skin</a></div><div class="mod-desc">1K skin textures — zero performance hit</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/344" target="_blank">All Customization Options Unlocked</a></div><div class="mod-desc">Every face/hair/body option in character creation</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Camera & Animations</h3><div class="cat-line"></div><span class="cat-count">2 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2362" target="_blank">Improved Camera</a></div><div class="mod-desc">RE4 / God of War style camera</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4825" target="_blank">Kei Animations - Legacy</a></div><div class="mod-desc">Complete animation overhaul — swords, shields, two-handed, all reworked</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Combat & Magic</h3><div class="cat-line"></div><span class="cat-count">9 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4244" target="_blank">UltraCombat V2</a></div><div class="mod-desc">Makes combat feel responsive instead of floaty</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2792" target="_blank">Responsive Combat AI</a></div><div class="mod-desc">Enemies fight smarter, not tankier</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/5197" target="_blank">Responsive Spellcaster AI</a></div><div class="mod-desc">Enemy mages actually use heals and buffs</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1098" target="_blank">Supreme Magicka</a></div><div class="mod-desc">Complete magic overhaul — makes magic actually worth using</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2149" target="_blank">Nascent Archery</a></div><div class="mod-desc">Better bow mechanics</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3965" target="_blank">Magic Skill Leveling Fixed</a></div><div class="mod-desc">Fair magic XP — no more casting 500 spells to level up</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1323" target="_blank">Way of the Fist</a></div><div class="mod-desc">Hand-to-hand combat that actually works</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/119" target="_blank">Unique Elemental Spells</a></div><div class="mod-desc">Fire burns, frost slows, shock drains — elements feel different</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1812" target="_blank">Engaging Combat</a></div><div class="mod-desc">Bleed and burn effects keep fights dangerous at high levels</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>AI & World</h3><div class="cat-line"></div><span class="cat-count">7 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/5140" target="_blank">NPC and Faction Overhaul</a></div><div class="mod-desc">NPCs with real identities — classes, stats, and faction roles reworked</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2228" target="_blank">Dynamic AI Animals</a></div><div class="mod-desc">Animals that behave like animals</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/791" target="_blank">Climates Revised</a></div><div class="mod-desc">Region-specific weather — it actually snows in the mountains</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/219" target="_blank">Quest NPCs Run</a></div><div class="mod-desc">Escort NPCs actually run instead of walking at 0.5 mph</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/5183" target="_blank">Ultimate Dialogue Overhaul</a></div><div class="mod-desc">NPCs say things that actually make sense</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3363" target="_blank">NPCs Come to Life</a></div><div class="mod-desc">NPCs have real schedules instead of standing around</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/182" target="_blank">Balanced NPC Level Cap</a></div><div class="mod-desc">Stops enemies from scaling infinitely with you</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Stealth</h3><div class="cat-line"></div><span class="cat-count">2 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1921" target="_blank">Better Sneak</a></div><div class="mod-desc">Sneak detection that makes sense — no more getting spotted through walls</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1732" target="_blank">Harder Stealth</a></div><div class="mod-desc">NPCs actually investigate — stealth is a skill, not an invisibility button</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Items & Progression</h3><div class="cat-line"></div><span class="cat-count">6 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/567" target="_blank">Auto Upgrade Leveled Items</a></div><div class="mod-desc">Your gear scales with you so quest rewards don't become useless</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/109" target="_blank">No Durability Damage</a></div><div class="mod-desc">No more constantly repairing your gear</div></div></div>
+        <div class="mod"><span class="badge b-obse">OBSE</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1253" target="_blank">No Enchantment Drain</a></div><div class="mod-desc">Enchanted weapons don't lose charge</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1734" target="_blank">Carry Weight + Weightless Misc</a></div><div class="mod-desc">No more inventory management simulator</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4645" target="_blank">Aiorta's Enchantment Adjustments</a></div><div class="mod-desc">Enchantment magnitudes that make sense</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1500" target="_blank">Better Enchanting and Soul Gems</a></div><div class="mod-desc">Soul gems and enchanting that feel rewarding</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Spells & Powers</h3><div class="cat-line"></div><span class="cat-count">4 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1087" target="_blank">Spell Duration x10</a></div><div class="mod-desc">Buff spells last way longer so you're not recasting every 30 seconds</div><div class="mod-tags"><span class="tag-warn">HEADS UP: negative effects last 10x too</span></div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1461" target="_blank">Unlimited Powers</a></div><div class="mod-desc">Greater Powers usable anytime, not once per day</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/138" target="_blank">Spell Freedom</a></div><div class="mod-desc">All spell effects available at the spellmaking altar</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1238" target="_blank">Spells Reworked</a></div><div class="mod-desc">Every vanilla spell rebalanced to actually be worth casting</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Travel & Mounts</h3><div class="cat-line"></div><span class="cat-count">3 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1496" target="_blank">Better Cyrodiil Travel</a></div><div class="mod-desc">Carriages and boats between cities</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1832" target="_blank">Horse Improvements</a></div><div class="mod-desc">Faster horses, can't die, won't snitch on you</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4527" target="_blank">A Horse With Saddlebags</a></div><div class="mod-desc">Storage on your horse — activate while sneaking</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>UI & Quality of Life</h3><div class="cat-line"></div><span class="cat-count">11 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/13" target="_blank">Better HUD Slim</a></div><div class="mod-desc">Cleaner interface</div></div></div>
+        <div class="mod"><span class="badge b-json">JSON</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3288" target="_blank">MISS Inventory Sorter</a></div><div class="mod-desc">Actually organized inventory</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1119" target="_blank">Auto Local Map</a></div><div class="mod-desc">Local maps reveal automatically</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/479" target="_blank">Additional Map Markers</a></div><div class="mod-desc">More places to discover on the map</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/153" target="_blank">Horse Whistle</a></div><div class="mod-desc">Call your horse from anywhere</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1913" target="_blank">Fixed Persuasion</a></div><div class="mod-desc">The speech minigame is less of a chore</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/418" target="_blank">Better Auto Lockpick</a></div><div class="mod-desc">Lockpicking that doesn't make you want to quit</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/783" target="_blank">PreserveStats</a></div><div class="mod-desc">Change your appearance without breaking your character</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1788" target="_blank">Quieter Lockpicking</a></div><div class="mod-desc">Less ear-piercing lockpick sounds</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/2479" target="_blank">Better Movement</a></div><div class="mod-desc">Hold and toggle sprint/sneak instead of the clunky vanilla system</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/85" target="_blank">Simple Photo Mode</a></div><div class="mod-desc">Freeze time, free camera, take screenshots</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Audio</h3><div class="cat-line"></div><span class="cat-count">2 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1267" target="_blank">High Quality Music Replacer</a></div><div class="mod-desc">Higher fidelity version of the soundtrack</div></div></div>
+        <div class="mod"><span class="badge b-pak">PAK</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1987" target="_blank">Armor Sound Overhaul</a></div><div class="mod-desc">Footsteps that sound like the armor you're wearing</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Survival</h3><div class="cat-line"></div><span class="cat-count">2 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3037" target="_blank">Core Survival</a></div><div class="mod-desc">Hunger, thirst, cooking, fishing — all toggleable</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/967" target="_blank">Basic Portable Tent</a></div><div class="mod-desc">Set up camp anywhere</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>Economy & Loot</h3><div class="cat-line"></div><span class="cat-count">3 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/5189" target="_blank">Jobs of Oblivion</a></div><div class="mod-desc">Take contracts from innkeepers — harvest, craft, earn gold</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4100" target="_blank">Immersive Vendor and Loot</a></div><div class="mod-desc">Shops and dungeons have interesting stuff in them</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/1871" target="_blank">Enhanced Endgame Loot</a></div><div class="mod-desc">High-level gear in dungeon chests at level 25+</div></div></div>
+      </div>
+    </div>
+
+    <div class="cat reveal">
+      <div class="cat-header"><h3>New Content</h3><div class="cat-line"></div><span class="cat-count">6 mods</span><span class="cat-toggle">&#x25BC;</span></div>
+      <div class="mods">
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3170" target="_blank">Dark Brotherhood Infinitum</a></div><div class="mod-desc">Radiant assassination contracts that keep going</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4225" target="_blank">Imperial Legion Infinitum</a></div><div class="mod-desc">Repeatable Legion missions</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/722" target="_blank">Advanced Followers</a></div><div class="mod-desc">Companions that are actually useful</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/763" target="_blank">Lakeheart Manor</a></div><div class="mod-desc">Player home near the Imperial City</div></div></div>
+        <div class="mod"><span class="badge b-esp">ESP</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/3858" target="_blank">Radiant Mages Guild Quests</a></div><div class="mod-desc">167 new dungeon crawl quests for the Mages Guild</div></div></div>
+        <div class="mod"><span class="badge b-ue4ss">UE4SS</span><div class="mod-info"><div class="mod-name"><a href="https://www.nexusmods.com/oblivionremastered/mods/4242" target="_blank">Mad Spell Pack</a></div><div class="mod-desc">32 new spells with unique effects across all schools</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="support" style="text-align:center;padding:4rem 2rem">
+  <div class="container">
+    <div class="reveal" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:3rem 2rem;max-width:550px;margin:0 auto">
+      <p class="section-label">Support</p>
+      <h2 class="section-title" style="margin-bottom:1rem">Free. Always.</h2>
+      <p style="color:var(--text-dim);font-size:1rem;max-width:400px;margin:0 auto 1.5rem;line-height:1.7">CHIM is free and always will be. If it saved you hours of mod hunting and troubleshooting, consider buying me a coffee.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="#" style="font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fff;padding:0.7rem 2rem;border:1px solid #ff5e5b;border-radius:20px;background:#ff5e5b;text-decoration:none;transition:all 0.2s">&#9749; Buy Me a Coffee</a>
+        <a href="https://github.com/Z3nGineer/chim-installer" style="font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:0.7rem 2rem;border:1px solid var(--border);border-radius:20px;text-decoration:none;transition:all 0.2s">&#x2606; Star on GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-chim">CHIM</div>
+  <div class="footer-iam">I &ensp; A M</div>
+  <p class="footer-credit">A modpack by <a href="https://z3ngineer.github.io" target="_blank">Z3nGineer</a></p>
+  <p style="font-size:0.6rem;color:var(--text-muted);margin-top:0.5rem">CHIM is not affiliated with Bethesda Softworks, ZeniMax, or Nexus Mods.</p>
+  <div id="ad-container" style="max-width:728px;margin:1.5rem auto 0;min-height:0"></div>
+  <div style="margin-top:1.2rem;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <span style="color:var(--text-muted);font-size:0.7rem;">Adventurers who've found the dream:</span>
+    <a href="https://hits.sh/z3ngineer.github.io/CHIM.html/" target="_blank" rel="noopener">
+      <img src="https://hits.sh/z3ngineer.github.io/CHIM.html.svg?style=flat&label=&color=c9a84c&labelColor=0a0a0a" alt="visitors" style="height:20px;vertical-align:middle;">
+    </a>
+  </div>
+</footer>
+
+<script>
+// Collapsible mod categories
+document.querySelectorAll('.cat-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const mods = header.nextElementSibling;
+    const toggle = header.querySelector('.cat-toggle');
+    if (mods) mods.classList.toggle('open');
+    if (toggle) toggle.classList.toggle('open');
+  });
+});
+
+// Cursor glow
+const g=document.getElementById('glow');
+document.addEventListener('mousemove',e=>{g.style.left=e.clientX+'px';g.style.top=e.clientY+'px'});
+
+// Scroll reveal
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target)}})},{threshold:0.08,rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Animated stat counters
+const counterObs=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(!entry.isIntersecting) return;
+    const el=entry.target;
+    const target=parseInt(el.dataset.count);
+    if(target===0){el.textContent='0';counterObs.unobserve(el);return}
+    let current=0;
+    const step=Math.max(1,Math.floor(target/40));
+    const interval=setInterval(()=>{
+      current+=step;
+      if(current>=target){current=target;clearInterval(interval)}
+      el.textContent=current;
+    },30);
+    counterObs.unobserve(el);
+  });
+},{threshold:0.5});
+document.querySelectorAll('.stat-num[data-count]').forEach(el=>counterObs.observe(el));
+
+// Parallax on scroll — hero bg and glow dividers
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const bg=document.querySelector('.hero-bg-img');
+  if(bg && y<window.innerHeight*1.5){
+    bg.style.transform=`scale(${1+y*0.0001}) translateY(${y*0.15}px)`;
+  }
+  // Glow dividers pulse on scroll proximity
+  document.querySelectorAll('.glow-divider').forEach(d=>{
+    const rect=d.getBoundingClientRect();
+    const dist=Math.abs(rect.top-window.innerHeight/2);
+    const opacity=Math.max(0.15,1-dist/(window.innerHeight*0.6));
+    d.style.opacity=opacity;
+  });
+},{passive:true});
+const gBtn=document.getElementById('globalHamburger'),gNav=document.getElementById('globalNavLinks');
+if(gBtn&&gNav){gBtn.addEventListener('click',()=>{gBtn.classList.toggle('open');gNav.classList.toggle('open')});gNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{gBtn.classList.remove('open');gNav.classList.remove('open')}))}
+
+// Floating gold particles
+;(function(){
+  const box=document.getElementById('particles');
+  if(!box) return;
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const size=Math.random()*5+3;
+    p.style.cssText=`
+      left:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      animation-duration:${Math.random()*7+5}s;
+      animation-delay:${Math.random()*6}s;
+    `;
+    box.appendChild(p);
+  }
+})();
+
+// Hero parallax on scroll
+;(function(){
+  const hero=document.querySelector('.hero');
+  if(!hero) return;
+  const h1=hero.querySelector('h1');
+  const sub=hero.querySelector('.hero-sub');
+  const desc=hero.querySelector('.hero-desc');
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY;
+    if(y>window.innerHeight) return;
+    const r=y/window.innerHeight;
+    if(h1) h1.style.transform=`translateY(${y*.15}px) scale(${1-r*.08})`;
+    if(sub) sub.style.transform=`translateY(${y*.1}px)`;
+    if(desc) desc.style.transform=`translateY(${y*.05}px)`;
+    hero.style.setProperty('--parallax-opacity',1-r*1.2);
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
