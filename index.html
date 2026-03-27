@@ -284,7 +284,10 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);po
 /* Smooth scroll */
 html{scroll-behavior:smooth}
 
-@media(max-width:900px){.phil-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){
+  .phil-grid{grid-template-columns:1fr 1fr}
+  [style*="grid-template-columns:1fr 1fr"]{gap:1rem !important}
+}
 .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:0.5rem}
 .nav-toggle span{display:block;width:22px;height:2px;background:var(--text);transition:all 0.3s}
 @media(max-width:700px){
@@ -296,6 +299,39 @@ html{scroll-behavior:smooth}
   .mod{flex-direction:column;gap:0.3rem}
   .badge{align-self:flex-start}
   section{padding:3.5rem 1.5rem}
+  /* Force all inline 2-col grids to single column on mobile */
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr !important}
+  /* Install section */
+  .install{padding:2rem 1.2rem}
+  .install h3{font-size:1rem}
+  .install-platforms{flex-direction:column;align-items:center;gap:0.8rem}
+  .install-platforms span,.install-platforms a{width:100%;text-align:center;box-sizing:border-box}
+  /* Step cards */
+  .step-card{padding:1.2rem}
+  .step-card .step-num{font-size:1rem}
+  .step-card p{font-size:0.85rem !important}
+  /* Launch options code block */
+  [style*="JetBrains Mono"]{font-size:0.6rem !important;padding:0.6rem 0.8rem !important}
+  /* Patches */
+  .patch{padding:1.2rem 1.2rem}
+  .patch h4{font-size:0.85rem}
+  .patch p{font-size:0.9rem}
+  /* Section titles */
+  .section-title{font-size:1.5rem !important}
+  .section-desc{font-size:1rem;padding:0 0.5rem}
+  /* Stats */
+  .stats-row{gap:1.2rem}
+  .stat-num{font-size:1.6rem}
+  .stat-label{font-size:0.65rem}
+  /* Deck required box */
+  [style*="gold-dim"][style*="border-radius:10px"]{padding:1rem 1.2rem !important}
+  /* Footer */
+  .footer-chim{font-size:1.2rem}
+  /* Scroll hint */
+  .scroll-hint{bottom:20px}
+  /* Support section */
+  #support .reveal{padding:2rem 1.2rem !important}
 }
 
 /* Global Nav */
