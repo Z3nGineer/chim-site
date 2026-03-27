@@ -195,6 +195,9 @@ section{padding:5rem 2rem;position:relative;z-index:2}
 .install h3{font-family:'Cinzel',serif;font-size:1.2rem;font-weight:700;color:var(--gold);letter-spacing:0.15em;margin-bottom:0.8rem;position:relative}
 .install p{color:var(--text-muted);font-weight:300;position:relative}
 
+/* Two-column grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+
 /* Install step cards */
 .step-card{
   background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;
@@ -286,7 +289,7 @@ html{scroll-behavior:smooth}
 
 @media(max-width:900px){
   .phil-grid{grid-template-columns:1fr 1fr}
-  [style*="grid-template-columns:1fr 1fr"]{gap:1rem !important}
+  .two-col{gap:1rem}
 }
 .nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:0.5rem}
 .nav-toggle span{display:block;width:22px;height:2px;background:var(--text);transition:all 0.3s}
@@ -299,9 +302,8 @@ html{scroll-behavior:smooth}
   .mod{flex-direction:column;gap:0.3rem}
   .badge{align-self:flex-start}
   section{padding:3.5rem 1.5rem}
-  /* Force all inline 2-col grids to single column on mobile */
-  [style*="grid-template-columns:1fr 1fr"],
-  [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr !important}
+  /* All two-col grids go single column on mobile */
+  .two-col{grid-template-columns:1fr !important}
   /* Install section */
   .install{padding:2rem 1.2rem}
   .install h3{font-size:1rem}
@@ -325,7 +327,6 @@ html{scroll-behavior:smooth}
   .stat-num{font-size:1.6rem}
   .stat-label{font-size:0.65rem}
   /* Deck required box */
-  [style*="gold-dim"][style*="border-radius:10px"]{padding:1rem 1.2rem !important}
   /* Footer */
   .footer-chim{font-size:1.2rem}
   /* Scroll hint */
@@ -488,7 +489,7 @@ html{scroll-behavior:smooth}
       <p class="section-desc reveal r2">I built a custom installer so you don't have to figure out where 79 mods go. Start from a clean game install — verify your files through Steam, then let the installer handle the rest.</p>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem" class="reveal r3">
+    <div class="two-col reveal r3">
       <div class="step-card">
         <div class="step-num"><span>1</span> Pick Your Profile</div>
         <p style="color:var(--text-dim);font-size:0.9rem;line-height:1.7">It figures out what you're running on and gives you two options. <strong style="color:var(--gold)">CHIM</strong> if you're on a PC with a real GPU — all 79 mods, everything maxed out. <strong><span style="color:var(--gold)">CHIM</span> <span style="color:#5c9fd6">Deck</span></strong> if you're on Steam Deck — swaps the heavy visual stuff for optimization mods that actually make the game run. Start with a fresh game — verify files in Steam first, and ideally start a new character for the full experience.</p>
@@ -524,7 +525,7 @@ html{scroll-behavior:smooth}
       <p class="section-desc reveal r2">Both versions get the full combat overhaul, magic rework, AI improvements, QoL fixes, and new content. The difference is how we handle visuals.</p>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem" class="reveal r3">
+    <div class="two-col reveal r3">
       <div class="step-card" style="border-color:var(--gold-dim)">
         <div style="font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:1.3rem;letter-spacing:0.1em;margin-bottom:0.3rem"><span style="color:var(--gold)">CHIM</span></div>
         <div style="color:var(--text-dim);font-size:0.8rem;margin-bottom:1rem">PC — Max Quality</div>
@@ -553,7 +554,7 @@ html{scroll-behavior:smooth}
       <p style="color:var(--text-dim);font-size:0.95rem;line-height:1.7;margin-bottom:1rem">Oblivion Remastered on Steam Deck is rough. 20-25 FPS on Low with stuttering everywhere, VRAM overflow crashes because the game tries to load more textures than the Deck's 4GB GPU memory can hold, and a loading screen bug that freezes your Deck about 90% of the time when you walk outside. Valve said "Verified." I disagree.</p>
 
       <div style="font-family:'Cinzel',serif;font-weight:700;color:#5c9fd6;font-size:1rem;margin-bottom:1rem;margin-top:1.5rem">What I Did About It</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="two-col" style="gap:1rem">
         <div style="color:var(--text-dim);font-size:0.85rem;line-height:1.7">
           <strong style="color:var(--text)">Killed the forced ray tracing</strong> — Lumen RT is the biggest FPS killer and the Deck can't even do hardware RT. Ripping it out gives you back 15-20 frames instantly.
         </div>
@@ -583,7 +584,7 @@ html{scroll-behavior:smooth}
       <div style="margin-top:2rem;padding:1.5rem 2rem;background:rgba(201,168,76,0.04);border:2px solid var(--gold-dim);border-radius:10px">
         <div style="font-family:'Cinzel',serif;font-weight:700;color:var(--gold);font-size:1.2rem;margin-bottom:0.8rem;letter-spacing:0.08em">&#x26a0; Required After Install</div>
         <p style="color:var(--text);font-size:0.95rem;line-height:1.7;margin-bottom:0.8rem">Hit the <strong>... button</strong> on your Deck and set these <strong>for this game</strong>. CHIM won't hit 30 FPS without them.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem 2rem;color:var(--text);font-size:0.95rem;line-height:2;margin-bottom:1rem">
+        <div class="two-col" style="gap:0.5rem 2rem;color:var(--text);font-size:0.95rem;line-height:2;margin-bottom:1rem">
           <div>Framerate Limit: <strong style="color:var(--gold)">30 FPS</strong></div>
           <div>Refresh Rate: <strong style="color:var(--gold)">40 Hz</strong></div>
           <div>Allow Tearing: <strong style="color:var(--gold)">Off</strong></div>
